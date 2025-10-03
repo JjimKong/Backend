@@ -1,0 +1,10 @@
+spring:
+  application:
+      name: JjimKong_Backend
+
+
+info:
+  app:
+    name: '@project.name@'
+    description: '@project.description@'
+    version: '@project.version@'
