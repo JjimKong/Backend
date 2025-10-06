@@ -1,7 +1,7 @@
 package com.jjimkong_backend.domain.groups.entity;
 
 import com.jjimkong_backend.domain.common.BaseEntity;
-import com.jjimkong_backend.domain.posts.Post;
+import com.jjimkong_backend.domain.posts.entity.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 

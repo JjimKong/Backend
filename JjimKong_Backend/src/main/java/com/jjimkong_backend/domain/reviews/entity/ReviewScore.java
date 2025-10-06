@@ -14,7 +14,7 @@ public class ReviewScore extends BaseEntity {
     @Column(name = "review_score_id")
     private Long id;
 
-    @Column(name = "score", precision = 2, scale = 1)
+    @Column(name = "score", precision = 2)
     private Double score;
 
     @ManyToOne(fetch = FetchType.LAZY)
