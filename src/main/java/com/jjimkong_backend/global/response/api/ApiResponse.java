@@ -6,13 +6,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ApiResponse<T> {
 
-    private String code;
+    private final String code;
 
-    private String status;
+    private final String status;
 
-    private String message;
+    private final String message;
 
-    private T data;
+    private final T data;
 
     public ApiResponse(String status, String message, T data, String code) {
         this.code = code;
