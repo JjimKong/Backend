@@ -4,7 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.jjimkong_backend.global.config.cookie.service.CookieService;
 import com.jjimkong_backend.global.config.redis.service.RedisService;
-import io.lettuce.core.RedisException;
+import com.jjimkong_backend.global.response.exception.ExceptionCode;
+import com.jjimkong_backend.global.response.exception.RedisException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -185,7 +186,7 @@ public class JwtService {
      */
     public void saveRefreshTokenToRedis(String email, String refreshToken) {
         if (refreshToken.length() > 4096 || email.length() > 256) {
-            throw new RedisException(ErrorCode.REDIS_DATA_SIZE_EXCEEDED_ERROR);
+            throw new RedisException(ExceptionCode.REDIS_DATA_SIZE_EXCEEDED_ERROR);
         }
 
         // 이메일을 키로 사용하여 RefreshToken 저장

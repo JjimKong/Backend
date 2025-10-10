@@ -53,11 +53,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         OAuth2UserInfo oauth2UserInfo = oAuth2Attributes.getOauth2UserInfo();
         String email = oauth2UserInfo.getEmail();
+        String nickname = oauth2UserInfo.getNickname();
 
         // 소셜 타입과 소셜 ID 로 조회된다면 이전에 로그인을 한 유저
         // DB 에 조회되지 않는다면 Role 을 GUEST 로 설정하여 반환 -> LoginSuccessHandler 에서 회원가입으로 리다이렉트 후 추가 정보를 받는다
         User user = userRepository.findByEmail(email)
-                .orElse(User.builder().email(email).role(Role.GUEST).provider(provider).build());
+                .orElse(User.builder().email(email).role(Role.GUEST).provider(provider).name(nickname).build());
 
         return new CustomOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(user.getRole().getKey())),

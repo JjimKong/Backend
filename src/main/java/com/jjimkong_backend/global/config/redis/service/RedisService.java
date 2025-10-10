@@ -20,7 +20,6 @@ import java.util.Map;
 public class RedisService {
 
     private final RedisTemplate redisTemplate;
-    private final HashOperations<String, String, Object> hashOperations;
     private Jackson2HashMapper mapper = new Jackson2HashMapper(true);
 
     public void setValues(String key, String data, Duration duration) {
@@ -33,15 +32,6 @@ public class RedisService {
         values.set(key, data);
     }
 
-    public void writeHash(String key, Object object) {
-        Map<String, Object> mappedHash = mapper.toHash(object);
-        hashOperations.putAll(key, mappedHash);
-    }
-
-    public Object loadHash(String key) {
-        Map<String, Object> loadedHash = hashOperations.entries(key);
-        return mapper.fromHash(loadedHash);
-    }
 
     public void setListValues(String key, Object value){
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
