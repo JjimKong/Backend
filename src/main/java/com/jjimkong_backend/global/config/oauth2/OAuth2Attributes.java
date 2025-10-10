@@ -4,6 +4,7 @@ import com.jjimkong_backend.domain.users.entity.Provider;
 import com.jjimkong_backend.domain.users.entity.User;
 import com.jjimkong_backend.global.config.oauth2.userinfo.GoogleOAuth2UserInfo;
 import com.jjimkong_backend.global.config.oauth2.userinfo.KakaoOAuth2UserInfo;
+import com.jjimkong_backend.global.config.oauth2.userinfo.NaverOAuth2UserInfo;
 import com.jjimkong_backend.global.config.oauth2.userinfo.OAuth2UserInfo;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,12 @@ public class OAuth2Attributes {
         if (provider == Provider.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
         }
-        return ofGoogle(userNameAttributeName, attributes);
+
+        if(provider == Provider.GOOGLE) {
+            return ofGoogle(userNameAttributeName, attributes);
+        }
+
+        return ofNaver(userNameAttributeName, attributes);
     }
 
     private static OAuth2Attributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
@@ -42,6 +48,13 @@ public class OAuth2Attributes {
         return OAuth2Attributes.builder()
                 .nameAttributeKey(userNameAttributeName)
                 .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
+                .build();
+    }
+
+    public static OAuth2Attributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuth2Attributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
                 .build();
     }
 
@@ -60,8 +73,12 @@ public class OAuth2Attributes {
 
         if ("GOOGLE".equals(registrationId)) {
             return Provider.GOOGLE;
-        } else if ("KAKAO".equals(registrationId)) {
+        }
+        if ("KAKAO".equals(registrationId)) {
             return Provider.KAKAO;
+        }
+        if("NAVER".equals(registrationId)) {
+            return Provider.NAVER;
         }
         return null;
     }
