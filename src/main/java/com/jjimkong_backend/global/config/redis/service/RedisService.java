@@ -1,17 +1,14 @@
 package com.jjimkong_backend.global.config.redis.service;
 
+import com.jjimkong_backend.global.response.exception.ExceptionCode;
+import com.jjimkong_backend.global.response.exception.RedisException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -19,8 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RedisService {
 
-    private final RedisTemplate redisTemplate;
-    private Jackson2HashMapper mapper = new Jackson2HashMapper(true);
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void setValues(String key, String data, Duration duration) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
@@ -32,12 +28,6 @@ public class RedisService {
         values.set(key, data);
     }
 
-
-    public void setListValues(String key, Object value){
-        ListOperations<String, Object> listOperations = redisTemplate.opsForList();
-        listOperations.rightPush(key, value);
-    }
-
     public String getValues(String key) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
         if (values.get(key) == null) {
@@ -46,20 +36,11 @@ public class RedisService {
         return (String) values.get(key);
     }
 
-    public List<Long> getLongListOpsValues(String key){
-        ListOperations<String, Long> listOperations = redisTemplate.opsForList();
-        return listOperations.range(key, 0, -1);
-    }
-
-    public List<String> getStringListOpsValues(String key){
-        ListOperations<String, String> listOperations = redisTemplate.opsForList();
-        return listOperations.range(key, 0, -1);
-    }
 
     public void deleteValues(String key) {
         if(Boolean.FALSE.equals(redisTemplate.delete(key))){
-            //throw new RedisException(ErrorCode.REDIS_DATA_DELETE_ERROR);
             log.error("Redis 데이터를 삭제하지 못했습니다.");
+            throw new RedisException(ExceptionCode.REDIS_DATA_DELETE_ERROR);
         }
     }
 
