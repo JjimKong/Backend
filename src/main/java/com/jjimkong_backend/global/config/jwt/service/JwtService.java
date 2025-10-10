@@ -39,7 +39,7 @@ public class JwtService {
 
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
-    private static final String EMAIL_CLAIM = "email";
+    private static final String PROVIDER_USER_ID_CLAIM = "providerUserId";
     private static final String PROVIDER_CLAIM = "provider";
     private static final String BEARER = "Bearer ";
 
@@ -55,7 +55,7 @@ public class JwtService {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod))
-                .withClaim(EMAIL_CLAIM, email)
+                .withClaim(PROVIDER_USER_ID_CLAIM, email+provider)
                 .withClaim(PROVIDER_CLAIM, provider)
                 .sign(Algorithm.HMAC512(secretKey));
     }
@@ -63,12 +63,12 @@ public class JwtService {
     /**
      * RefreshToken 생성
      */
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(String getProviderUserId) {
         Date now = new Date();
         return JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
-                .withClaim(EMAIL_CLAIM, email)
+                .withClaim(PROVIDER_USER_ID_CLAIM, getProviderUserId)
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
@@ -106,14 +106,14 @@ public class JwtService {
     }
 
     /**
-     * AccessToken 에서 Email 추출
+     * AccessToken 에서 ProviderUserId 추출
      */
-    public Optional<String> extractEmail(String accessToken) {
+    public Optional<String> extractProviderUserId(String accessToken) {
         try {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
                     .verify(accessToken)
-                    .getClaim(EMAIL_CLAIM)
+                    .getClaim(PROVIDER_USER_ID_CLAIM)
                     .asString());
         } catch (Exception e) {
             log.error("엑세스 토큰이 유효하지 않습니다.");
@@ -122,14 +122,14 @@ public class JwtService {
     }
 
     /**
-     * RefreshToken 에서 Email 추출
+     * RefreshToken 에서 ProviderUserId 추출
      */
-    public Optional<String> extractEmailFromRefreshToken(String refreshToken) {
+    public Optional<String> extractProviderUserIdFromRefreshToken(String refreshToken) {
         try {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
                     .verify(refreshToken)
-                    .getClaim(EMAIL_CLAIM)
+                    .getClaim(PROVIDER_USER_ID_CLAIM)
                     .asString());
         } catch (Exception e) {
             log.error("리프레시 토큰이 유효하지 않습니다.");
@@ -182,23 +182,23 @@ public class JwtService {
     }
 
     /**
-     * Redis에 RefreshToken 저장 (email을 키로 사용)
+     * Redis에 RefreshToken 저장 (ProviderUserId 키로 사용)
      */
-    public void saveRefreshTokenToRedis(String email, String refreshToken) {
-        if (refreshToken.length() > 4096 || email.length() > 256) {
+    public void saveRefreshTokenToRedis(String getProviderUserId, String refreshToken) {
+        if (refreshToken.length() > 4096 || getProviderUserId.length() > 256) {
             throw new RedisException(ExceptionCode.REDIS_DATA_SIZE_EXCEEDED_ERROR);
         }
 
         // 이메일을 키로 사용하여 RefreshToken 저장
-        redisService.setValues(email, refreshToken, Duration.ofDays(TimeUnit.MILLISECONDS.toSeconds(refreshTokenExpirationPeriod)));
+        redisService.setValues(getProviderUserId, refreshToken, Duration.ofDays(TimeUnit.MILLISECONDS.toSeconds(refreshTokenExpirationPeriod)));
     }
 
     /**
      * Redis에서 RefreshToken 조회
      */
-    public Optional<String> getRefreshTokenFromRedis(String email) {
+    public Optional<String> getRefreshTokenFromRedis(String getProviderUserId) {
         try {
-            String refreshToken = redisService.getValues(email);
+            String refreshToken = redisService.getValues(getProviderUserId);
             return Optional.ofNullable(refreshToken);
         } catch (Exception e) {
             log.error("Redis에서 RefreshToken 조회 실패: {}", e.getMessage());
@@ -209,10 +209,10 @@ public class JwtService {
     /**
      * Redis에서 RefreshToken 제거
      */
-    public void removeRefreshTokenFromRedis(String email) {
+    public void removeRefreshTokenFromRedis(String getProviderUserId) {
         try {
-            redisService.deleteValues(email);
-            log.info("Redis에서 RefreshToken 제거 완료: {}", email);
+            redisService.deleteValues(getProviderUserId);
+            log.info("Redis에서 RefreshToken 제거 완료: {}", getProviderUserId);
         } catch (Exception e) {
             log.error("Redis에서 RefreshToken 제거 실패: {}", e.getMessage());
         }

@@ -5,6 +5,7 @@ import com.jjimkong_backend.domain.users.entity.User;
 import com.jjimkong_backend.domain.users.repository.UserRepository;
 import com.jjimkong_backend.global.config.jwt.service.JwtService;
 import com.jjimkong_backend.global.config.oauth2.CustomOAuth2User;
+import com.jjimkong_backend.global.response.api.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,9 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private void checkAccessTokenAndAuthentication(String accessToken, FilterChain filterChain, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        jwtService.extractEmail(accessToken)
-                .ifPresent(email -> userRepository.findByEmail(email)
-                        .ifPresent(this::saveAuthentication));
+        jwtService.extractProviderUserId(accessToken).flatMap(userRepository::findByProviderUserId).ifPresent(this::saveAuthentication);
 
         filterChain.doFilter(request, response);
     }

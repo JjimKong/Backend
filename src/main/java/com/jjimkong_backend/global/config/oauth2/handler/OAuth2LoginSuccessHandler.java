@@ -1,6 +1,5 @@
 package com.jjimkong_backend.global.config.oauth2.handler;
 
-import com.jjimkong_backend.domain.users.entity.Role;
 import com.jjimkong_backend.domain.users.entity.User;
 import com.jjimkong_backend.global.config.jwt.service.JwtService;
 import com.jjimkong_backend.global.config.oauth2.CustomOAuth2User;
@@ -24,39 +23,26 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        log.info("OAuth2LoginSuccessHandler.onAuthenticationSuccess() 실행 - OAuth2 로그인 성공 요청 진입");
 
         try {
             User user = ((CustomOAuth2User) authentication.getPrincipal()).getUser();
             String accessToken = jwtService.createAccessToken(user.getEmail(), user.getProvider().name());
 
-            // 최초 로그인인 경우 추가 정보 입력을 위한 회원가입 페이지로 리다이렉트
-            if (user.getRole() == Role.GUEST) {
-                handleGuestLogin(response, user);
-            } else {
-                handleUserLogin(response, accessToken, user.getEmail());
-            }
+            // 로그인 성공 후 토큰 발급 및 리디렉션 처리
+            handleUserLogin(response, accessToken, user.getProviderUserId());
+
         } catch (Exception e) {
             log.error("OAuth2 로그인 처리 중 오류 발생: ", e);
             throw e;
         }
     }
 
-    private void handleGuestLogin(HttpServletResponse response, User user) throws IOException {
-        log.info("GUEST 상태 - 추가 정보 입력 페이지로 리디렉션");
-
-        // email과 provider 정보를 객체로 묶어서 리디렉션
-        String redirectUrl = "https://ddang.site.dev/register?email=" + user.getEmail() + "&provider=" + user.getProvider().name();
-        log.info("Redirecting to: {}", redirectUrl);
-
-        // 리디렉션
-        response.sendRedirect(redirectUrl);
-    }
-
-    private void handleUserLogin(HttpServletResponse response, String accessToken, String email) throws IOException {
+    private void handleUserLogin(HttpServletResponse response, String accessToken, String getProviderUserId) throws IOException {
         log.info("USER 상태 - 로그인 성공 처리");
 
-        String refreshToken = jwtService.createRefreshToken(email);
-        jwtService.saveRefreshTokenToRedis(email, refreshToken);
+        String refreshToken = jwtService.createRefreshToken(getProviderUserId);
+        jwtService.saveRefreshTokenToRedis(getProviderUserId, refreshToken);
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
         // 사용자가 로그인 성공 시 홈 페이지로 리디렉션
