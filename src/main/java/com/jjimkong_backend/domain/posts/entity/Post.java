@@ -1,13 +1,15 @@
 package com.jjimkong_backend.domain.posts.entity;
 
-import com.jjimkong_backend.domain.category.entity.Category;
 import com.jjimkong_backend.domain.common.BaseEntity;
 import com.jjimkong_backend.domain.users.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts")
 public class Post extends BaseEntity {
 
@@ -32,7 +34,23 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
     private Category category;
+
+    public Post(String region, String detailAddress, String restaurantName, String restaurantUid, User user, Category category) {
+        this.region = region;
+        this.detailAddress = detailAddress;
+        this.restaurantName = restaurantName;
+        this.restaurantUid = restaurantUid;
+        this.user = user;
+        this.category = category;
+    }
+
+    public void update(String region, String detailAddress, String restaurantName, Category category) {
+        this.region = region;
+        this.detailAddress = detailAddress;
+        this.restaurantName = restaurantName;
+        this.category = category;
+    }
 }
