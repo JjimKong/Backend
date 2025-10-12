@@ -1,16 +1,22 @@
 package com.jjimkong_backend.domain.users.entity;
 
 import com.jjimkong_backend.domain.common.BaseEntity;
+import com.jjimkong_backend.domain.common.Status;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
+@FilterDef(name = "activeFilter", parameters = @ParamDef(name = "status", type = String.class))
+@Filter(name = "activeFilter", condition = "status = :status")
 public class User extends BaseEntity {
 
     @Id
@@ -35,6 +41,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @Builder
     public User(Long id, String name, String email, Provider provider, String providerUserId, Role role){
         this.id = id;
@@ -43,5 +53,10 @@ public class User extends BaseEntity {
         this.provider = provider;
         this.providerUserId = providerUserId;
         this.role = role;
+        this.status = Status.ACTIVE;
+    }
+
+    public void delete() {
+        this.status = Status.DELETED;
     }
 }
