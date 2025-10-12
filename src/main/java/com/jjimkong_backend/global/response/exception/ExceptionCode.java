@@ -6,6 +6,12 @@ import static org.springframework.http.HttpStatus.*;
 
 public enum ExceptionCode {
 
+    // Post
+    NOT_FOUND_POST("E_PST_001", NOT_FOUND, "해당하는 Post가 없습니다."),
+    NOT_FOUND_USER("E_PST_002", NOT_FOUND, "해당하는 User가 없습니다."),
+    NO_PERMISSION_TO_UPDATE_POST("E_PST_003", FORBIDDEN, "Post 수정 권한이 없습니다."),
+    NO_PERMISSION_TO_DELETE_POST("E_PST_004", FORBIDDEN, "Post 삭제 권한이 없습니다."),
+
     // 400 에러
 
     // 401 에러
