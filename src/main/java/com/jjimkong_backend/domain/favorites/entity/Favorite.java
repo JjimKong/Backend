@@ -4,12 +4,18 @@ import com.jjimkong_backend.domain.common.BaseEntity;
 import com.jjimkong_backend.domain.posts.entity.Post;
 import com.jjimkong_backend.domain.users.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "favorites")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Favorite extends BaseEntity {
 
     @Id
