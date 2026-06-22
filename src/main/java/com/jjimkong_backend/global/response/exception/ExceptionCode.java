@@ -20,7 +20,10 @@ public enum ExceptionCode {
 
     // Redis
     REDIS_DATA_SIZE_EXCEEDED_ERROR("E_REDIS", BAD_REQUEST, "Redis에 저장할 데이터 크기가 허용치를 초과했습니다."),
-    REDIS_DATA_DELETE_ERROR("E_REDIS", BAD_REQUEST, "Redis에 저장된 데이터 삭제 중 오류가 발생했습니다.");
+    REDIS_DATA_DELETE_ERROR("E_REDIS", BAD_REQUEST, "Redis에 저장된 데이터 삭제 중 오류가 발생했습니다."),
+
+    // Map (네이버 지도/검색)
+    NAVER_SEARCH_API_ERROR("E_MAP_001", BAD_GATEWAY, "네이버 검색 API 호출 중 오류가 발생했습니다.");
 
     private final String code;
     private String message;
