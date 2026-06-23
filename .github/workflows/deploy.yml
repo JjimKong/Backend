@@ -1,0 +1,57 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # 수동 배포 트리거
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push image to ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$ECR_REPOSITORY:latest
+
+      # EC2에 접속해 최신 이미지를 pull 하고 컨테이너를 재기동한다.
+      # 사전 준비: EC2에 docker/docker compose 설치, ECR pull 권한(인스턴스 IAM 역할),
+      #           ~/app/docker-compose.yml 과 ~/app/.env 배치.
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} \
+              | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+            cd ~/app
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
