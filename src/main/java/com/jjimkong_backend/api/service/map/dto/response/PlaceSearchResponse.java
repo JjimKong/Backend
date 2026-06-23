@@ -1,5 +1,7 @@
 package com.jjimkong_backend.api.service.map.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
 /**
@@ -13,9 +15,16 @@ import java.util.List;
  * @param display 실제 반환된 결과 수
  * @param items   장소 목록
  */
+@Schema(description = "장소(맛집) 검색 응답")
 public record PlaceSearchResponse(
+
+        @Schema(description = "전체 검색 결과 수", example = "5")
         int total,
+
+        @Schema(description = "실제 반환된 결과 수", example = "2")
         int display,
+
+        @Schema(description = "장소 목록")
         List<PlaceItem> items
 ) {
 
@@ -38,14 +47,31 @@ public record PlaceSearchResponse(
      * @param longitude   경도(WGS84)
      * @param latitude    위도(WGS84)
      */
+    @Schema(description = "개별 장소 정보")
     public record PlaceItem(
+
+            @Schema(description = "장소명 (HTML 태그 제거됨)", example = "스시 오마카세 강남점")
             String title,
+
+            @Schema(description = "업종 분류", example = "일식>초밥,롤")
             String category,
+
+            @Schema(description = "설명", example = "")
             String description,
+
+            @Schema(description = "전화번호", example = "02-123-4567")
             String telephone,
+
+            @Schema(description = "지번 주소", example = "서울특별시 강남구 역삼동 123-45")
             String address,
+
+            @Schema(description = "도로명 주소", example = "서울특별시 강남구 테헤란로 1")
             String roadAddress,
+
+            @Schema(description = "경도(WGS84)", example = "127.0276368")
             Double longitude,
+
+            @Schema(description = "위도(WGS84)", example = "37.4979517")
             Double latitude
     ) {
 
