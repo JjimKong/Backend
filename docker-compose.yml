@@ -8,12 +8,15 @@ services:
       - "8080:8080"
     env_file:
       - .env
-    # EC2에 올려둔 application.yml(실제 설정값 포함)을 컨테이너가 읽도록 마운트한다.
+    # EC2 ~/app/config 폴더의 운영용 application*.yaml 들을 통째로 마운트한다.
     # WORKDIR가 /app 이라 file:./config/ 위치가 자동 검색되어 별도 설정 없이 로드된다.
     volumes:
-      - ./application.yml:/app/config/application.yml:ro
-    # Redis는 같은 compose 네트워크의 'redis' 서비스명으로 접근해야 하므로 yml 값을 덮어쓴다.
+      - ./config:/app/config:ro
     environment:
+      # 운영 구동 프로파일. 컨테이너 classpath엔 yaml이 없고 /app/config 에만 있으므로
+      # config.import 대신 jwt/oauth/aws 프로파일을 직접 활성화해 외부 파일을 로드한다.
+      - SPRING_PROFILES_ACTIVE=prod,jwt,oauth,aws
+      # Redis는 같은 compose 네트워크의 'redis' 서비스명으로 접근해야 하므로 yaml 값을 덮어쓴다.
       - SPRING_DATA_REDIS_HOST=redis
     depends_on:
       - redis
