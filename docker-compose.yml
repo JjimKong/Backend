@@ -8,6 +8,13 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    # EC2에 올려둔 application.yml(실제 설정값 포함)을 컨테이너가 읽도록 마운트한다.
+    # WORKDIR가 /app 이라 file:./config/ 위치가 자동 검색되어 별도 설정 없이 로드된다.
+    volumes:
+      - ./application.yml:/app/config/application.yml:ro
+    # Redis는 같은 compose 네트워크의 'redis' 서비스명으로 접근해야 하므로 yml 값을 덮어쓴다.
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
     depends_on:
       - redis
     restart: unless-stopped
