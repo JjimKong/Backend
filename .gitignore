@@ -8,6 +8,10 @@ build/
 ## Resources
 /src/main/resources
 
+## Env (secrets) — .env.example만 추적
+.env
+!.env.example
+
 ### STS ###
 .apt_generated
 .classpath

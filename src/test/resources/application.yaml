@@ -1,0 +1,43 @@
+# CI/테스트 전용 설정.
+# 운영 설정(src/main/resources/*.yaml)은 .gitignore라 CI 체크아웃에 없으므로,
+# @SpringBootTest 컨텍스트 로드가 통과하도록 시크릿 없는 더미값만 채운다.
+# (실제 비밀값을 절대 넣지 말 것 — 추적되는 파일이다.)
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  # SecurityConfig.oauth2Login() 이 ClientRegistrationRepository 빈을 요구한다.
+  # google 한 곳만 더미로 등록해도 빈이 생성되어 컨텍스트가 뜬다.
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+
+jwt:
+  secretKey: test-secret-key-for-ci-only-do-not-use-in-prod-1234567890-abcdefghij
+  access:
+    expiration: 3600000
+    header: Authorization
+  refresh:
+    expiration: 1209600000
+
+naver:
+  search:
+    base-url: https://openapi.naver.com
+    client-id: test-naver-client-id
+    client-secret: test-naver-client-secret
