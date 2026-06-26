@@ -49,28 +49,25 @@ public class PostServiceImpl implements PostService {
     public Long savePost(PostSaveRequest request, List<MultipartFile> images, User user) {
 
         Post post = postRepository.save(request.toEntity(user));
-
-        if (images != null) {
-            for (MultipartFile image : images) {
-                if (image == null || image.isEmpty()) {
-                    continue;
-                }
-                S3Service.UploadResult result = s3Service.upload(image, POST_IMAGE_DIR);
-                postImageRepository.save(new PostImage(post, result.url(), result.key()));
-            }
-        }
+        uploadImages(post, images);
         return post.getId();
     }
 
     @Override
     @Transactional
-    public Long updatePost(Long postId, PostUpdateRequest request, Long userId) {
+    public Long updatePost(Long postId, PostUpdateRequest request, List<MultipartFile> images, Long userId) {
         Post post = findPostById(postId);
         if (!post.getUser().getId().equals(userId)) {
             throw new BadRequestException(ExceptionCode.NO_PERMISSION_TO_UPDATE_POST);
         }
 
         post.update(request.region(), request.detailAddress(), request.restaurantName(), request.category());
+
+        // images가 전달된 경우에만 기존 이미지를 전부 교체(소프트 삭제 후 새로 업로드). null이면 기존 유지.
+        if (images != null) {
+            postImageRepository.findByPostId(postId).forEach(PostImage::delete);
+            uploadImages(post, images);
+        }
         return postId;
     }
 
@@ -95,6 +92,19 @@ public class PostServiceImpl implements PostService {
         return postImageRepository.findByPostId(postId).stream()
                 .map(PostImage::getImageUrl)
                 .toList();
+    }
+
+    private void uploadImages(Post post, List<MultipartFile> images) {
+        if (images == null) {
+            return;
+        }
+        for (MultipartFile image : images) {
+            if (image == null || image.isEmpty()) {
+                continue;
+            }
+            S3Service.UploadResult result = s3Service.upload(image, POST_IMAGE_DIR);
+            postImageRepository.save(new PostImage(post, result.url(), result.key()));
+        }
     }
 
 }

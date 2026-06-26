@@ -15,7 +15,7 @@ public interface PostService {
 
     Long savePost(PostSaveRequest request, List<MultipartFile> images, User user);
 
-    Long updatePost(Long postId, PostUpdateRequest request, Long userId);
+    Long updatePost(Long postId, PostUpdateRequest request, List<MultipartFile> images, Long userId);
 
     void deletePost(Long postId, Long userId);
 }
