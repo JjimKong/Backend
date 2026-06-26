@@ -25,4 +25,9 @@ public abstract class BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
     private Status status = Status.ACTIVE;
+
+    /** 소프트 삭제 — 실제 삭제 대신 status를 DELETED로 변경한다. */
+    public void delete() {
+        this.status = Status.DELETED;
+    }
 }

@@ -6,10 +6,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("status = 'ACTIVE'")  // 소프트 삭제: 모든 조회에서 DELETED 자동 제외
 @Table(name = "posts")
 public class Post extends BaseEntity {
 
