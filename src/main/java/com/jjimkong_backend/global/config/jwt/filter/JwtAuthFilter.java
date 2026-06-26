@@ -33,7 +33,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             "/login", "/api/v1/member/join", "/api/v1/member/sign-up", "/favicon.ico",
             "/api/v1/member/reissue", "/swagger", "/swagger-ui.html",
             "/swagger-ui/index.html", "/swagger-ui", "/v3/api-docs", "/ws", "/default-ui.css",
-            "/api/v1/maps");   // 장소 검색 등 공개 API (인증 불필요)
+            "/api/v1/maps",    // 장소 검색 등 공개 API (인증 불필요)
+            "/api/v1/dev");    // [dev 전용] 테스트 토큰 발급 (prod엔 컨트롤러 미등록)
 
     private final JwtService jwtService;
     private final UserRepository userRepository;

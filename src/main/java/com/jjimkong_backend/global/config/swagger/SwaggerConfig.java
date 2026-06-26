@@ -3,6 +3,7 @@ package com.jjimkong_backend.global.config.swagger;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,8 @@ public class SwaggerConfig {
                         .title("JjimKong API")
                         .description("JjimKong 백엔드 REST API 문서")
                         .version("v1"))
+                // 전역 적용: Authorize 에 넣은 토큰을 모든 요청의 Authorization 헤더로 보낸다.
+                .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME))
                 .components(new Components()
                         .addSecuritySchemes(BEARER_SCHEME, new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)

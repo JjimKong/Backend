@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/css/**", "/js/**", "/favicon.ico").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger/**", "/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/member/join", "/api/v1/member/reissue").permitAll()
+                        .requestMatchers("/api/v1/dev/**").permitAll()   // [dev 전용] 테스트 토큰 발급 (prod엔 컨트롤러 미등록 → 404)
                         .requestMatchers(HttpMethod.GET, "/api/v1/maps/**").permitAll()
                         .requestMatchers("/ws", "/ws/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
