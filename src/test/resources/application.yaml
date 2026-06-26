@@ -41,3 +41,14 @@ naver:
     base-url: https://openapi.naver.com
     client-id: test-naver-client-id
     client-secret: test-naver-client-secret
+
+# S3Config 가 cloud.aws.* 를 @Value 로 읽으므로 CI 컨텍스트 로드용 더미값 필요
+cloud:
+  aws:
+    s3:
+      bucket: test-bucket
+    region:
+      static: ap-northeast-2
+    credentials:
+      accessKey: test-access-key
+      secretKey: test-secret-key

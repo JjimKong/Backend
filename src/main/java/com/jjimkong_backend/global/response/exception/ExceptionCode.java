@@ -6,6 +6,12 @@ import static org.springframework.http.HttpStatus.*;
 
 public enum ExceptionCode {
 
+    // Post
+    NOT_FOUND_POST("E_PST_001", NOT_FOUND, "해당하는 Post가 없습니다."),
+    NOT_FOUND_USER("E_PST_002", NOT_FOUND, "해당하는 User가 없습니다."),
+    NO_PERMISSION_TO_UPDATE_POST("E_PST_003", FORBIDDEN, "Post 수정 권한이 없습니다."),
+    NO_PERMISSION_TO_DELETE_POST("E_PST_004", FORBIDDEN, "Post 삭제 권한이 없습니다."),
+
     // 400 에러
 
     // 401 에러
@@ -23,7 +29,11 @@ public enum ExceptionCode {
     REDIS_DATA_DELETE_ERROR("E_REDIS", BAD_REQUEST, "Redis에 저장된 데이터 삭제 중 오류가 발생했습니다."),
 
     // Map (네이버 지도/검색)
-    NAVER_SEARCH_API_ERROR("E_MAP_001", BAD_GATEWAY, "네이버 검색 API 호출 중 오류가 발생했습니다.");
+    NAVER_SEARCH_API_ERROR("E_MAP_001", BAD_GATEWAY, "네이버 검색 API 호출 중 오류가 발생했습니다."),
+
+    // Image (S3)
+    IMAGE_UPLOAD_FAILED("E_IMG_001", HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+    INVALID_IMAGE_FILE("E_IMG_002", BAD_REQUEST, "유효하지 않은 이미지 파일입니다.");
 
     private final String code;
     private String message;
