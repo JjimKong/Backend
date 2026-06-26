@@ -8,8 +8,10 @@ import com.jjimkong_backend.global.config.oauth2.CustomOAuth2User;
 import com.jjimkong_backend.global.response.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,13 +44,19 @@ public class PostControllerV1 {
     }
 
     /**
-     * ✅ 가게 생성
-     * POST /api/v1/posts
+     * ✅ 가게 생성 (이미지 다중 업로드)
+     * POST /api/v1/posts  (multipart/form-data)
+     *  - request: PostSaveRequest(JSON)
+     *  - images : 이미지 파일들(선택)
      */
-    @PostMapping
-    public ApiResponse<Long> savePost(@RequestBody PostSaveRequest request, @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
-        log.info("PostControllerV1.savePost - userId: {}", customOAuth2User.getUser().getId());
-        return ApiResponse.ok(postService.savePost(request, customOAuth2User.getUser()));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Long> savePost(
+            @RequestPart("request") PostSaveRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        log.info("PostControllerV1.savePost - userId: {}, imageCount: {}",
+                customOAuth2User.getUser().getId(), images == null ? 0 : images.size());
+        return ApiResponse.ok(postService.savePost(request, images, customOAuth2User.getUser()));
     }
 
     /**
