@@ -37,9 +37,11 @@ public class DevTokenController {
     @GetMapping("/token")
     public ApiResponse<String> issueTestToken(
             @RequestParam(defaultValue = "test@jjimkong.com") String email,
-            @RequestParam(defaultValue = "GOOGLE") String provider) {
+            @RequestParam(defaultValue = "GOOGLE") String provider,
+            @RequestParam(defaultValue = "USER") String role) {
 
         // 토큰 클레임 providerUserId = email + provider 와 동일하게 맞춰야 JwtAuthFilter가 유저를 찾는다.
+        // ADMIN 권한 테스트 시: ?email=admin@jjimkong.com&role=ADMIN 처럼 다른 email로 새 유저를 만든다.
         String providerUserId = email + provider;
         User user = userRepository.findByProviderUserId(providerUserId)
                 .orElseGet(() -> userRepository.save(
@@ -48,7 +50,7 @@ public class DevTokenController {
                                 .email(email)
                                 .provider(Provider.valueOf(provider))
                                 .providerUserId(providerUserId)
-                                .role(Role.USER)
+                                .role(Role.valueOf(role))
                                 .build()));
 
         String accessToken = jwtService.createAccessToken(email, provider);

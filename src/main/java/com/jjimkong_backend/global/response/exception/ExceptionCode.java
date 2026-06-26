@@ -33,7 +33,13 @@ public enum ExceptionCode {
 
     // Image (S3)
     IMAGE_UPLOAD_FAILED("E_IMG_001", HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
-    INVALID_IMAGE_FILE("E_IMG_002", BAD_REQUEST, "유효하지 않은 이미지 파일입니다.");
+    INVALID_IMAGE_FILE("E_IMG_002", BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
+
+    // Review
+    NOT_FOUND_REVIEW("E_RVW_001", NOT_FOUND, "해당하는 리뷰가 없습니다."),
+    NO_PERMISSION_TO_UPDATE_REVIEW("E_RVW_002", FORBIDDEN, "리뷰 수정 권한이 없습니다."),
+    NO_PERMISSION_TO_DELETE_REVIEW("E_RVW_003", FORBIDDEN, "리뷰 삭제 권한이 없습니다."),
+    NOT_FOUND_REVIEW_CRITERIA("E_RVW_004", NOT_FOUND, "해당하는 평가 기준이 없습니다.");
 
     private final String code;
     private String message;
